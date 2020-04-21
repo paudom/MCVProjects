@@ -13,6 +13,7 @@ from torch.utils.data.dataset import Dataset
 from .registry import DATASETS
 
 
+
 @DATASETS.register_module
 class InShopDataset(Dataset):
     CLASSES = None
@@ -22,15 +23,13 @@ class InShopDataset(Dataset):
                  img_file,
                  label_file,
                  id_file,
-                 bbox_file,
-                 landmark_file,
                  img_size,
                  class_mapping,
                  roi_plane_size=7,
                  retrieve=False,
                  find_three=False):
-
         self.img_path = img_path
+        self.class_mapping = class_mapping
 
         normalize = transforms.Normalize(
             mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
@@ -44,6 +43,9 @@ class InShopDataset(Dataset):
         # read img names
         fp = open(img_file, 'r')
         self.img_list = [x.strip() for x in fp]
+        self.class_ids = []
+        for img in self.img_list:
+            self.class_ids.append(self.class_mapping[img.split("/")[2]])
 
         # collect id
         self.ids = []
@@ -81,11 +83,10 @@ class InShopDataset(Dataset):
             self.landmarks = None
 
         self.find_three = find_three
-        self.class_mapping = class_mapping
 
     def get_basic_item(self, idx):
         img = Image.open(os.path.join(self.img_path, self.img_list[idx]))
-        class_id = torch.tensor(self.class_mapping[self.img_list[idx].split("/")[2]])
+        class_id = torch.tensor(self.class_ids[idx])
         img_id = self.ids[idx]
         width, height = img.size
 
@@ -117,7 +118,7 @@ class InShopDataset(Dataset):
 
         landmark = torch.from_numpy(np.array(landmark)).float()
         img = self.transform(img)
-        data = {'img': img, 'landmark': landmark, 'id': img_id, 'attr': label, 'target':class_id}
+        data = {'img': img, 'landmark': landmark, 'id': img_id, 'attr': label, 'target': class_id}
         return data
 
     def get_three_items(self, idx):
@@ -154,7 +155,6 @@ class InShopDataset(Dataset):
 
         data = {
             'img': anchor_data['img'],
-            'target': anchor_data['target']
             'landmark': anchor_data['landmark'],
             'id': anchor_data['id'],
             'attr': anchor_data['attr'],

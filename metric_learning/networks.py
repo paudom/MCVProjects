@@ -35,7 +35,6 @@ class EmbeddingNet(nn.Module):
     def get_embedding(self, x):
         return self.forward(x)
 
-
 class EmbeddingNetL2(EmbeddingNet):
     def __init__(self):
         super(EmbeddingNetL2, self).__init__()
@@ -47,7 +46,6 @@ class EmbeddingNetL2(EmbeddingNet):
 
     def get_embedding(self, x):
         return self.forward(x)
-
 
 class ClassificationNet(nn.Module):
     def __init__(self, embedding_net, n_classes, features):
@@ -66,7 +64,6 @@ class ClassificationNet(nn.Module):
     def get_embedding(self, x):
         return self.nonlinear(self.embedding_net(x))
 
-
 class SiameseNet(nn.Module):
     def __init__(self, embedding_net):
         super(SiameseNet, self).__init__()
@@ -79,7 +76,6 @@ class SiameseNet(nn.Module):
 
     def get_embedding(self, x):
         return self.embedding_net(x)
-
 
 class TripletNet(nn.Module):
     def __init__(self, embedding_net):

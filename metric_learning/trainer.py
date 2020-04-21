@@ -36,7 +36,6 @@ def fit(train_loader, val_loader, model, loss_fn, optimizer, scheduler, n_epochs
 
         print(message)
 
-
 def train_epoch(train_loader, model, loss_fn, optimizer, cuda, log_interval, metrics):
     for metric in metrics:
         metric.reset()
@@ -45,9 +44,7 @@ def train_epoch(train_loader, model, loss_fn, optimizer, cuda, log_interval, met
     losses = []
     total_loss = 0
 
-    for batch_idx, anchor_data in enumerate(train_loader):
-        data = anchor_data['img']
-        target = anchor_data['target']
+    for batch_idx, (data, target) in enumerate(train_loader):
         target = target if len(target) > 0 else None
         if not type(data) in (tuple, list):
             data = (data,)
@@ -90,7 +87,6 @@ def train_epoch(train_loader, model, loss_fn, optimizer, cuda, log_interval, met
 
     total_loss /= (batch_idx + 1)
     return total_loss, metrics
-
 
 def test_epoch(val_loader, model, loss_fn, cuda, metrics):
     with torch.no_grad():
