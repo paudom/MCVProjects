@@ -1,0 +1,7 @@
+
+# Gitignore
+__pycache__/
+.DS_Store
+
+metric_learning/Data/
+
